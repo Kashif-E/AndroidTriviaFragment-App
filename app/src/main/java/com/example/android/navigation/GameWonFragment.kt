@@ -16,10 +16,9 @@
 
 package com.example.android.navigation
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
@@ -32,9 +31,45 @@ class GameWonFragment : Fragment() {
         // Inflate the layout for this fragment
         val binding: FragmentGameWonBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_game_won, container, false)
-        binding.nextMatchButton.setOnClickListener{view: View->
+        binding.nextMatchButton.setOnClickListener { view: View ->
             view.findNavController()
-                    .navigate(R.id.action_gameOverFragment_to_gameFragment)}
+                    .navigate(GameWonFragmentDirections.actionGameWonFragmentToGameFragment())
+        }
+        // Replaced action id(R.id.action_gameOverFragment_to_gameFragment) with navDirection class(GameWonFragmentDirections.actionGameWonFragmentToGameFragment())
+        // Replaced the action ID with the equivalent method from the appropriate NavDirection class:
+        //  now the app is set up so that you can easily pass arguments using NavDirection classes whenever needed.
+        setHasOptionsMenu(true)
+
         return binding.root
     }
-}
+    // Creating our Share Intent
+    private fun getShareIntent() : Intent {
+        val args = GameWonFragmentArgs.fromBundle(arguments!!)
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, getString(R.string.share_success_text, args.numCorrect, args.numQuestions))
+        return shareIntent
+    }
+    // Starting an Activity with our new Intent
+    private fun shareSuccess() {
+        startActivity(getShareIntent())
+    }
+
+    // Showing the Share Menu Item Dynamically
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.winner_menu, menu)
+        // check if the activity resolves
+        if (null == getShareIntent().resolveActivity(activity!!.packageManager)) {
+            // hide the menu item if it doesn't resolve
+            menu?.findItem(R.id.share)?.setVisible(false)
+        }
+    }
+        // Sharing from the Menu
+        override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+            when (item!!.itemId) {
+                R.id.share -> shareSuccess()
+            }
+            return super.onOptionsItemSelected(item)
+        }
+    }

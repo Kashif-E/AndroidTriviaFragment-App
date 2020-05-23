@@ -34,7 +34,10 @@ class GameOverFragment : Fragment() {
 
         binding.tryAgainButton.setOnClickListener{view: View->
             view.findNavController()
-                    .navigate(R.id.action_gameOverFragment_to_gameFragment)}
+                    .navigate(GameOverFragmentDirections.actionGameOverFragmentToGameFragment())
+           // Replaced the action ID with the equivalent method from the appropriate NavDirection class: to use safe arguments.
+                  // now the app is set up so that you can easily pass arguments using NavDirection classes whenever needed.
+        }
         return binding.root
     }
 }
